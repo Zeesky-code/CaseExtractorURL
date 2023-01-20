@@ -36,7 +36,6 @@ public class Extractor {
 
 			List rulingmetaData = getMetadata(rulingText);
 
-
 			Element link = ruling.select("a[href]").get(0);
 			String judgementLink = print( "%s ",link.attr("abs:href"), trim(link.text(), 35));
 
@@ -103,10 +102,12 @@ public class Extractor {
 		return metaData;
 	}
 	private static String getRulingDetails(String judgementLink) throws IOException {
-		Document rulingDocument = Jsoup.parse(new URL(judgementLink).openStream(), "CP1252", judgementLink);
-
+		//Document rulingDocument = Jsoup.parse(new URL(judgementLink).openStream(), "CP1252", judgementLink);
+		Document rulingDocument = Jsoup.connect(judgementLink).get();
 		Elements rulingDetails = rulingDocument.getElementsByClass("WordSection1");
-		return rulingDetails.text();
+		String rulingDetailsText = new String(rulingDetails.text().getBytes("UTF-8"), "CP1252");
+
+		return rulingDetailsText;
 	}
 
 }
