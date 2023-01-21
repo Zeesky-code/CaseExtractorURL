@@ -29,17 +29,23 @@ public class Extractor {
 		return Integer.valueOf(lastPage);
 	}
 	public static void main(String[] args) throws IOException, SQLException, ParseException {
+		System.out.println("Judgement Scraping started");
+		DBConnector.createDB();
 		int numberOfPages = getNumberOfPages();
 		int j =1;
+		PreparedStatement Pstmt = DBConnector.createConnection();
 		for (int i = 1; i < numberOfPages+1; i++) {
 			String url = "https://kararlarbilgibankasi.anayasa.gov.tr/?page="+i;
 			Document document = Jsoup.parse(new URL(url).openStream(), "CP1252", url);
 			Elements rulings = document.getElementsByClass("birkarar");
 
-			PreparedStatement Pstmt = DBConnector.createConnection();
+			if(i % 100 == 0){
+				Pstmt.executeBatch();
+				Pstmt = DBConnector.createConnection();
+			}
+
 			for (Element ruling:rulings) {
 				String rulingText = ruling.text();
-				System.out.println(rulingText);
 
 				Map rulingmetaData = getMetadata(rulingText);
 
@@ -48,24 +54,21 @@ public class Extractor {
 
 				String rulingContent = getRulingDetails(judgementLink);
 
-
-
 				Pstmt.setInt(1,j);
 				Pstmt.setString(2,rulingmetaData.get("title").toString());
 				Pstmt.setString(3,rulingmetaData.get("kararNumber").toString());
 
 				String dateString = rulingmetaData.get("kararTarihi").toString();
-				System.out.println(dateString);
 				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				Date date = dateFormat.parse(dateString);
 
-
 				Pstmt.setDate(4, new java.sql.Date(date.getTime()));
-				Pstmt.setString(5,rulingContent);
+				Pstmt.setString(5,judgementLink);
+				Pstmt.setString(6,rulingContent);
 				Pstmt.addBatch();
 				j++;
 			}
-			Pstmt.executeBatch();
+
 		}
 	}
 
@@ -93,7 +96,6 @@ public class Extractor {
 		Matcher titleMatcher = titlePattern.matcher(text);
 		if (titleMatcher.find()) {
 			String title = titleMatcher.group(1);
-			System.out.println(title);
 			metaData.put("title",title);
 		}
 		// Regular expression to match the number after "Karar Number"
@@ -101,14 +103,12 @@ public class Extractor {
 		Matcher kararNumberMatcher = kararNumberPattern.matcher(text);
 		if (kararNumberMatcher.find()) {
 			String kararNumber = kararNumberMatcher.group(1);
-			System.out.println(kararNumber);
 			metaData.put("kararNumber",kararNumber);
 		}else{
 			Pattern kararNumberEnglishPattern = Pattern.compile("Başvurusuna İlişkin Karar English\\s*(\\d+/\\d+)");
 			Matcher kararNumberEnglishMatcher = kararNumberEnglishPattern.matcher(text);
 			if(kararNumberEnglishMatcher.find()) {
 				String kararNumber = kararNumberEnglishMatcher.group(1);
-				System.out.println(kararNumber);
 				metaData.put("kararNumber", kararNumber);
 			}
 		}
@@ -117,7 +117,6 @@ public class Extractor {
 		Matcher kararTarihiMatcher = kararTarihiPattern.matcher(text);
 		if (kararTarihiMatcher.find()) {
 			String kararTarihi = kararTarihiMatcher.group(1);
-			System.out.println( kararTarihi);
 			metaData.put("kararTarihi",kararTarihi);
 		}
 

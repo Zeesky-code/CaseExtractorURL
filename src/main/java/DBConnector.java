@@ -1,7 +1,4 @@
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
+import java.sql.*;
 
 public class DBConnector {
 	static final String JDBC_Driver = "org.h2.Driver";
@@ -12,18 +9,30 @@ public class DBConnector {
 	static Connection conn = null;
 	static PreparedStatement Pstmt;
 
-	public static PreparedStatement createConnection (){
+	public static void createDB (){
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
 			conn =DriverManager.getConnection(DB_URL,USER,PASS );
+			Statement stmt = conn.createStatement();
+			String createDB = "CREATE TABLE TC_RULINGS ("+
+					"id INTEGER not NULL, "+
+					"title VARCHAR(255), "+
+					"basvuru_no VARCHAR(255),"+
+					"karar_tarihi DATE,"+
+					"url TEXT,"+
+					"ruling_content LONGTEXT, "+
+					"PRIMARY KEY (id))";
 
-			Pstmt= conn.prepareStatement("INSERT INTO judgements(id,title,basvuru_no,karar_tarihi,ruling_content)" + "values(?,?,?,?,?)");
 
+			stmt.executeUpdate(createDB);
 
 
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+	public static PreparedStatement createConnection() throws SQLException {
+		Pstmt= conn.prepareStatement("INSERT INTO TC_RULINGS(id,title,basvuru_no,karar_tarihi,url,ruling_content)" + "values(?,?,?,?,?,?)");
 		return Pstmt;
 	}
 	public static void main(String[] args) {
