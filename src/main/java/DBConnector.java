@@ -1,7 +1,6 @@
 import java.sql.*;
 
 public class DBConnector {
-	static final String JDBC_Driver = "org.h2.Driver";
 	static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/rulings";
 
 	static final String USER = "root";
@@ -11,7 +10,7 @@ public class DBConnector {
 
 	public static void createDB (){
 		try {
-			Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+			Class.forName("com.mysql.cj.jdbc.Driver");
 			conn =DriverManager.getConnection(DB_URL,USER,PASS );
 			Statement stmt = conn.createStatement();
 			String createDB = "CREATE TABLE TC_RULINGS ("+
@@ -34,8 +33,5 @@ public class DBConnector {
 	public static PreparedStatement createConnection() throws SQLException {
 		Pstmt= conn.prepareStatement("INSERT INTO TC_RULINGS(id,title,basvuru_no,karar_tarihi,url,ruling_content)" + "values(?,?,?,?,?,?)");
 		return Pstmt;
-	}
-	public static void main(String[] args) {
-
 	}
 }
