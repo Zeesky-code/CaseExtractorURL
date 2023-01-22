@@ -26,8 +26,8 @@ public class Extractor {
 		return Integer.valueOf(lastPage);
 	}
 	public static void main(String[] args) throws IOException, SQLException, ParseException, InterruptedException {
-		System.out.println("Judgement Scraping started");
 		int numberOfPages = getNumberOfPages();
+		System.out.println("Judgement Scraping started: Collecting "+ numberOfPages *10 + " judgements.");
 		DBConnector.createDB();
 		BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
 
@@ -37,6 +37,7 @@ public class Extractor {
 				TimeUnit.MILLISECONDS,
 				queue);
 
+		System.out.println("Scraping would take a while, please be patient.");
 
 		for (int i = 1; i <= numberOfPages; i ++) {
 			Scraper scraper = new Scraper(i, DBConnector.conn);
@@ -46,7 +47,7 @@ public class Extractor {
 		executor.shutdown();
 		executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-		System.out.println("Judgement Scraping ended"+ new Date().getTime());
+		System.out.println("Judgement Scraping ended");
 
 
 	}
