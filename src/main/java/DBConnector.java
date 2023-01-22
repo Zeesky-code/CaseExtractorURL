@@ -1,10 +1,15 @@
+import io.github.cdimascio.dotenv.Dotenv;
+
 import java.sql.*;
 
 public class DBConnector {
-	static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/rulings";
 
-	static final String USER = "root";
-	static final String PASS = "Daddy123";
+	//load DB variables
+	static Dotenv dotenv = Dotenv.load();
+	static final String DB_URL = dotenv.get("DB_URL");
+	static final String USER = dotenv.get("USER");
+	static final String PASS = dotenv.get("PASS");
+
 	static Connection conn = null;
 	static PreparedStatement Pstmt;
 
@@ -16,7 +21,7 @@ public class DBConnector {
 			String createDB = "CREATE TABLE TC_RULINGS ("+
 					"id INTEGER not NULL, "+
 					"title VARCHAR(255), "+
-					"basvuru_no VARCHAR(255),"+
+					"basvuru_no VARCHAR(20),"+
 					"karar_tarihi DATE,"+
 					"url TEXT,"+
 					"ruling_content LONGTEXT, "+
