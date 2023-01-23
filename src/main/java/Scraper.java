@@ -44,7 +44,7 @@ public class Scraper implements Runnable {
 				Map rulingmetaData = getMetadata(rulingText);
 
 				Element link = ruling.select("a[href]").get(0);
-				String judgementLink = print("%s ", link.attr("abs:href"), trim(link.text(), 35));
+				String judgementLink =  link.attr("abs:href");
 
 				String rulingContent = getRulingDetails(judgementLink);
 				stmt.setInt(1,startNumber);
@@ -67,16 +67,7 @@ public class Scraper implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	private static String print(String msg, Object... args) {
-		return String.format(msg, args);
-	}
 
-	private static String trim(String s, int width) {
-		if (s.length() > width)
-			return s.substring(0, width-1) + ".";
-		else
-			return s;
-	}
 	private static Map getMetadata(String text) throws UnsupportedEncodingException {
 		Map metaData = new HashMap();
 
