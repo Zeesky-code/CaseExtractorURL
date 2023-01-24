@@ -108,6 +108,8 @@ public class Scraper implements Runnable {
 	private static String getRulingDetails(String judgementLink) throws IOException {
 		Document rulingDocument = Jsoup.connect(judgementLink).get();
 		Elements rulingDetails = rulingDocument.getElementsByClass("WordSection1");
-		return rulingDetails.text();
+
+		return rulingDetails.html();
 	}
+
 }
